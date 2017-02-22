@@ -38,6 +38,18 @@ class Point(object):
     def __ne__(self, point):
         return not self.__eq__(point)
 
+    def __lt__(self, other):
+        return (self.x, self.y) < (other.x, other.y)
+
+    def __le__(self, other):
+        return self.__lt__(other) or self.__eq__(other)
+
+    def __gt__(self, other):
+        return not(self.__le__(other))
+
+    def __ge__(self, other):
+        return self.__gt__(other) or self.__eq__(other)
+
     def __str__(self):
         return "(%.2f, %.2f)" % (self.x, self.y)
 
