@@ -111,7 +111,7 @@ def visible_vertices(point, graph, origin=None, destination=None, scan='full'):
     return visible
 
 
-def polygon_crossing(p1, poly_edges):
+def point_inside_polygon(p1, poly_edges):
     """Returns True if Point p1 is internal to the polygon The polygon is
     defined by the Edges in poly_edges. Uses crossings algorithm and takes into
     account edges that are collinear to p1."""
@@ -150,13 +150,35 @@ def edge_in_polygon(p1, p2, graph):
         return False
     if p1.polygon_id == -1 or p2.polygon_id == -1:
         return False
-    mid_point = Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2)
-    return polygon_crossing(mid_point, graph.polygons[p1.polygon_id])
 
+    poly_edges = list(graph.polygons[p1.polygon_id])
 
-def point_in_polygon(p, graph):
+    poly_vertices = list(map(lambda e: e.p1, poly_edges))
+    poly_vertices.remove(p1)
+    poly_vertices.remove(p2)
+
+    colinear = list(filter(lambda v: ccw(p1, v, p2) == 0, poly_vertices))
+
+    # Every poly vertex on the segment between p1 and p2
+    between = list(filter(lambda v: on_segment(p1, v, p2), colinear))
+    between += [p1, p2]
+    between.sort()
+
+    def midpoint_check(p1, p2):
+        mid_point = Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2)
+        return point_inside_polygon(mid_point, graph.polygons[p1.polygon_id])
+
+    in_polygon = False
+    for v in range(len(between) - 1):
+        in_polygon = in_polygon or midpoint_check(between[v], between[v+1])
+        if in_polygon:
+            return in_polygon
+
+    return in_polygon
+
+def point_in_which_polygon(p, graph):
     for polygon in graph.polygons:
-        if polygon_crossing(p, graph.polygons[polygon]):
+        if point_inside_polygon(p, graph.polygons[polygon]):
             return polygon
     return -1
 
@@ -201,7 +223,7 @@ def closest_point(p, graph, polygon_id, length=0.001):
         vsum = unit_vector(Point(0, 0), Point(v1.x + v2.x, v1.y + v2.y))
         close1 = Point(c.x + (vsum.x * length), c.y + (vsum.y * length))
         close2 = Point(c.x - (vsum.x * length), c.y - (vsum.y * length))
-        if point_in_polygon(close1, graph) == -1:
+        if point_in_which_polygon(close1, graph) == -1:
             return close1
         return close2
     else:

@@ -27,7 +27,7 @@ from multiprocessing import Pool
 
 from pyvisgraph.graph import Graph, Edge
 from pyvisgraph.shortest_path import shortest_path
-from pyvisgraph.visible_vertices import visible_vertices, point_in_polygon
+from pyvisgraph.visible_vertices import visible_vertices, point_in_which_polygon
 from pyvisgraph.visible_vertices import closest_point
 
 PYTHON3 = version_info[0] == 3
@@ -128,7 +128,7 @@ class VisGraph(object):
     def point_in_polygon(self, point):
         """Return polygon_id if point in a polygon, -1 otherwise."""
 
-        return point_in_polygon(point, self.graph)
+        return point_in_which_polygon(point, self.graph)
 
     def closest_point(self, point, polygon_id, length=0.001):
         """Return closest Point outside polygon from point.
