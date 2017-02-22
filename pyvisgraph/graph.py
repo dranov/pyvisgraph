@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 from collections import defaultdict
+from math import fabs
+ZERO = 0.000000001
 
 
 class Point(object):
@@ -33,7 +35,7 @@ class Point(object):
         self.polygon_id = polygon_id
 
     def __eq__(self, point):
-        return point and self.x == point.x and self.y == point.y
+        return point and fabs(self.x - point.x) < ZERO and fabs(self.y - point.y) < ZERO
 
     def __ne__(self, point):
         return not self.__eq__(point)

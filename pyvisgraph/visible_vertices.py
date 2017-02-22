@@ -22,10 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 from __future__ import division
-from math import pi, sqrt, atan, acos
+from math import pi, sqrt, atan, acos, fabs
 from pyvisgraph.graph import Point
 
-INF = 10000
+INF = 1000000
+ZERO = 0.000000001
 
 
 def visible_vertices(point, graph, origin=None, destination=None, scan='full'):
@@ -122,8 +123,8 @@ def polygon_crossing(p1, poly_edges):
         if p1.y < edge.p1.y and p1.y < edge.p2.y: continue
         if p1.y > edge.p1.y and p1.y > edge.p2.y: continue
         # Deal with points colinear to p1
-        co0 = (ccw(p1, edge.p1, p2) == 0) and (edge.p1.x > p1.x)
-        co1 = (ccw(p1, edge.p2, p2) == 0) and (edge.p2.x > p1.x)
+        co0 = (ccw(p1, edge.p1, p2) == 0) and fabs(edge.p1.x - p1.x) > ZERO
+        co1 = (ccw(p1, edge.p2, p2) == 0) and fabs(edge.p2.x - p1.x) > ZERO
         co_point = edge.p1 if co0 else edge.p2
         if co0 or co1:
             if edge.get_adjacent(co_point).y > p1.y:
@@ -284,8 +285,8 @@ def angle2(point_a, point_b, point_c):
 def ccw(A, B, C):
     """Return 1 if counter clockwise, -1 if clock wise, 0 if collinear """
     area = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x)
-    if area > 0: return 1
-    if area < 0: return -1
+    if area > ZERO: return 1
+    if area < -ZERO: return -1
     return 0
 
 
