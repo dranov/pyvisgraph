@@ -79,7 +79,7 @@ class VisGraph(object):
             return None
 
         points = self.graph.get_points()
-        batch_size = int(len(points) / workers)
+        batch_size = max(1, int(len(points) / workers))
         batches = [(self.graph, points[i:i + batch_size], i/batch_size, status)
                    for i in xrange(0, len(points), batch_size)]
         pool = Pool(workers)
